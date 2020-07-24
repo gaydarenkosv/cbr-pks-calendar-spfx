@@ -4,13 +4,15 @@ import { UploadOutlined } from '@ant-design/icons';
 import { DatePicker, TimePicker } from 'antd';
 import * as moment from "moment";
 import { DatePickerTSX } from './DatePickerTSX';
+import { useDispatch } from 'react-redux';
+import { setEditMode } from '../Actions';
 
 const { TextArea } = Input
 
-const EditForm = () => {
+const EditFormCard = () => {
 
     const [form] = Form.useForm();
-
+    const dispatch = useDispatch();
 
 
     const fileListInit = [
@@ -62,6 +64,9 @@ const EditForm = () => {
         multiple: true,
     };
 
+    const closeEditForm = () => {
+        dispatch(setEditMode(0));
+    }
 
 
     return (
@@ -182,7 +187,7 @@ const EditForm = () => {
                 <Button type="primary" htmlType="submit" shape="round" size="large">
                     Сохранить
                 </Button>
-                <Button htmlType="submit" shape="round" size="large">
+                <Button htmlType="submit" shape="round" size="large" onClick={closeEditForm}>
                     Отмена
             </Button>
             </Form.Item>
@@ -190,4 +195,4 @@ const EditForm = () => {
     );
 }
 
-export default EditForm;
+export default EditFormCard;

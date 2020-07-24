@@ -3,30 +3,38 @@ import styles from './EventCard.module.scss';
 import Modal from './Modal';
 import Participants from './Participants';
 import Materials from './Materials';
+import { default as IEventProps } from '../Models/Event';
+import { useReducer, useDispatch } from 'react-redux';
+import { setEditMode } from '../Actions';
 
+const editIcon = require("../Icons/Edit.svg") as string;
+
+// eventCardNew: IEventProps
 const EventCard = () => {
 
-
   // hardcode test data
-  const cardInfoInit = {
-    dates: {
-      dateFrom: "2020-10-05T14:48:00.000Z",
-      dateTo: "2020-10-10T14:48:00.000Z"
+  const cardInfoInit =
+  {
+    "allDay": true,
+    "attachmentsCount": 89,
+    "category": {
+      "id": 1,
+      "name": "Мероприятия",
+      "color": "#ff0000"
     },
-    time: {
-      allDay: true,
-      from: null,
-      to: null
-    },
-    status: true,
-    location: "Москва, 1-й Волоколамский проезд д.10 строение 3.",
-    title: "Курс: Основы визуального моделирования с использованием UML 2.x",
-    description: "Код: REQ-001</br>Организатор: Luxoft Training",
-    tags: ["Прочие события"],
-    participants: ["65afa", "65chdv", "65gsv"],
-    materials: ["material"],
-    feedback: [{ author: "65afa", comment: "nice" }, { author: "65chdv", comment: "not nice" }]
+    "description": "<p> Метания копья в зале. </p>",
+    "endDate": "2020-07-04T00:42:37.3002723",
+    "feedbacksCount": 4,
+    "freeVisit": true,
+    "id": 17,
+    "isParticipant": false,
+    "linksCount": 98,
+    "location": "Location 058",
+    "participantsCount": 13,
+    "startDate": "2020-06-16T00:42:37.3002723",
+    "title": "Event 058"
   }
+
 
   // month names for translation
   const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
@@ -34,15 +42,37 @@ const EventCard = () => {
   ];
 
 
+  // modal types
   const modalTypes = ["Участники", "Материалы", "Отзывы"]
 
+
   // react hooks instead of props
-  const [cardInfo, setCardInfo] = React.useState(cardInfoInit);
+  const [eventCard] = React.useState(cardInfoInit);
+
 
   // open modal state
-
   const [stateModal, setModal] = React.useState(false);
   const [modalType, setModalType] = React.useState(null);
+
+
+  const dispatch = useDispatch()
+
+  // event card styled by categorie color
+  const categorieColor = eventCard.category.color ? eventCard.category.color : '#000000';
+  const categorieStyle: React.CSSProperties = {
+    color: categorieColor,
+    borderColor: categorieColor,
+  }
+
+  const categorieBorderStyle: React.CSSProperties = {
+    borderColor: categorieColor
+  }
+
+
+  // 
+  const openEditForm = () => {
+    dispatch(setEditMode(1))
+  }
 
   function openModal(type: number): void {
     setModalType(type);
@@ -51,7 +81,6 @@ const EventCard = () => {
 
 
   function closeModal(): void {
-    console.log("closed modal");
     setModal(false);
   }
 
@@ -61,51 +90,52 @@ const EventCard = () => {
       <div className={styles.dates}>
         <div className={styles.dateFrom}>
           <span className={styles.dateDest}>с</span>
-          <span className={styles.dateDay}>{new Date(cardInfo.dates.dateFrom).getUTCDate()}</span>
-          <span className={styles.dateMonth}>{monthNames[new Date(cardInfo.dates.dateFrom).getMonth()]}</span>
-          <span className={styles.dateYear}>{new Date(cardInfo.dates.dateFrom).getUTCFullYear()}</span>
+          <span className={styles.dateDay}>{new Date(eventCard.startDate).getUTCDate()}</span>
+          <span className={styles.dateMonth}>{monthNames[new Date(eventCard.startDate).getMonth()]}</span>
+          <span className={styles.dateYear}>{new Date(eventCard.startDate).getUTCFullYear()}</span>
         </div>
         <div className={styles.dateTo}>
           <span className={styles.dateDest}>по</span>
-          <span className={styles.dateDay}>{new Date(cardInfo.dates.dateTo).getUTCDate()}</span>
-          <span className={styles.dateMonth}>{monthNames[new Date(cardInfo.dates.dateTo).getMonth()]}</span>
-          <span className={styles.dateYear}>{new Date(cardInfo.dates.dateTo).getUTCFullYear()}</span>
+          <span className={styles.dateDay}>{new Date(eventCard.endDate).getUTCDate()}</span>
+          <span className={styles.dateMonth}>{monthNames[new Date(eventCard.endDate).getMonth()]}</span>
+          <span className={styles.dateYear}>{new Date(eventCard.endDate).getUTCFullYear()}</span>
         </div>
       </div>
-      <div className={styles.info}>
+      <div className={styles.info} style={categorieBorderStyle}>
+        <a className={styles.editLink} onClick={openEditForm}>
+          <img src={editIcon} className={styles.editIcon} />
+        </a>
         <div className={styles.header}>
           {
-            cardInfo.time.allDay ?
+            eventCard.allDay ?
               <div className={styles.time}>Событие на весь день</div>
               :
-              <div className={styles.time}>{cardInfo.time.from} - {cardInfo.time.from}</div>
+              <div className={styles.time}>{new Date(eventCard.startDate).getHours()} - {new Date(eventCard.endDate).getHours()}</div>
           }
           {
-            cardInfo.status ?
+            eventCard.isParticipant ?
               <div className={styles.status}>Вы участник</div>
               :
               null
           }
-          <div className={styles.location}>{cardInfo.location}</div>
+          <div className={styles.location}>{eventCard.location}</div>
         </div>
-        <div className={styles.title}>{cardInfo.title}</div>
-        <div className={styles.description} dangerouslySetInnerHTML={{ __html: cardInfo.description }}></div>
+        <div className={styles.title}>{eventCard.title}</div>
+        <div className={styles.description} dangerouslySetInnerHTML={{ __html: eventCard.description }}></div>
         <div className={styles.tags}>
           <ul>
-            {cardInfo.tags.map((tag, i) => (
-              <li key={i}>{tag}</li>
-            ))}
+            <li style={categorieStyle}>{eventCard.category.name}</li>
           </ul>
         </div>
         <div className={styles.footer}>
-          <div className="participants" onClick={() => { openModal(0) }}>Список участников ({cardInfo.participants.length})</div>
+          {/* <div className="participants" onClick={() => { openModal(0) }}>Список участников ({cardInfo.participantsCount})</div>
           {
-            cardInfo.materials && cardInfo.materials.length > 0 ?
-              <div className="materials" onClick={() => { openModal(1) }}>Материалы ({cardInfo.materials.length})</div>
+            cardInfo.attachmentsCount > 0 ?
+              <div className="materials" onClick={() => { openModal(1) }}>Материалы ({cardInfo.attachmentsCount})</div>
               :
               null
           }
-          <div className={styles.feedback} onClick={() => { openModal(2) }}>Отзывы {cardInfo.feedback && cardInfo.feedback.length > 0 ? `(${cardInfo.feedback.length})` : null}</div>
+          <div className={styles.feedback} onClick={() => { openModal(2) }}>Отзывы {cardInfo.feedbacksCount > 0 ? `(${cardInfo.feedbacksCount})` : null}</div> */}
         </div>
       </div>
       {
