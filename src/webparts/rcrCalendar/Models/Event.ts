@@ -2,6 +2,10 @@ import Model from './Model';
 import BaseLink from './BaseLink';
 import Category from './Category';
 import Comment from './Comment';
+import Actor from './Actor';
+import Material from './Material';
+import Link from './Link';
+import User from './User';
 
 export default class Event implements Model {
     public id: number;
@@ -18,8 +22,12 @@ export default class Event implements Model {
     public participantsCount: number;
     public attachmentsCount: number;
     public feedbacksCount: number;
+    public actors: Actor[];
+    public materials: Material[];
+    public links: Link[];
+    public author: User;
     // tslint:disable-next-line:variable-name
     public _links: BaseLink;
-    [key: string]: string | number | Date | BaseLink | Category | boolean | Comment[];
+    // [key: string]: number | string | BaseLink | Category | boolean;
 
 }
